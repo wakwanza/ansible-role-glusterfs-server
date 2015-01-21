@@ -1,0 +1,50 @@
+---
+# tasks file for glusterfs-server
+- name: installl the EPEL repo
+  copy: src=epel.repo dest=/etc/yum.repos.d/epel.repo owner=root group=root mode=644
+
+- name: install the glusterfs repo
+  copy: src=glusterfs.repo dest=/dest=/etc/yum.repos.d/glusterfs.repo owner=root group=root mode=644
+
+- name: install the dependencies
+  yum: pkg={{ item }} state=installed
+  with_items:
+  - libselinux
+  - libselinux-python
+  - python-pip
+  - xfsprogs
+  - fuse
+  - fuse-libs
+
+- name: install the glusterfs packages
+  yum: pkg={{ item }} state=installed
+  with_items:
+  - glusterfs-fuse
+  - glusterfs-server
+  - glusterfs-geo-replication
+  - glusterfs-devel
+  - glusterfs
+
+- name: create the filesystem mount path
+  file: path={{ data_dir }} state=present
+
+- name: format the data brick to xfs
+  command: /sbin/mkfs.xfs -i size=512 {{ dev_path }}
+
+- name: copy the script to mount and persist in fstab
+  copy: src=setmount.sh dest=/tmp mode=0770
+
+- name: mount the data brick
+  command: sh /tmp/setmount.sh
+
+- name: start the rpcbind and glusterd deamons
+  service: name={{ item }} state=started  enabled=yes
+  - rpcbind
+  - glusterd
+
+- name: start the trusted pool
+  command: gluster peer probe {{ item }}
+  with_items: groups.glusternodes
+
+- include: bootstrap.yml
+

@@ -1,0 +1,7 @@
+---
+# handlers file for glusterfs-server
+- name: restart rpcbind
+  service: name=rpcbind state=restarted
+
+- name: restart glusterd
+  service: name=glusterd state=restarted

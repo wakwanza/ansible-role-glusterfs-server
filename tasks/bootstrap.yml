@@ -1,0 +1,8 @@
+---
+- hosts: glusterbootstrap
+  - name: make the replicated brick
+    command: gluster volume create RB0 replica 2 {{ item }}:/{{ data_dir }}/RB0
+    with_items: group.glusternodes
+
+  - name: start the volume
+    command: gluster volume start RB0
