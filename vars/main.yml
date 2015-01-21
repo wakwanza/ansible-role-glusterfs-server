@@ -1,5 +1,5 @@
 ---
 # vars file for glusterfs-server
-- data_dir :
-- dev_path: 
-- replica_set: 
+ data_dir :
+ dev_path: 
+ replica_set: 
